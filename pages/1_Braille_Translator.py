@@ -4,16 +4,6 @@ import numpy as np
 import streamlit as st
 from PIL import Image
 
-
-"""
-Braille Measurements provided by up.codes/s/braille
-
-Dot diameter: 0.059-0.063 inches
-Distance between center of dots in the same cell: 0.090-0.100 inches
-Distance corresponding dots in adjacent cells: 0.241-0.300 inches
-Distance between corresponding dots from one cell directly below: 0.395-0.400 inches
-"""
-    
 def find_bounds(dots):
     """Finds the bounding rectangle for the braille characters
 
@@ -218,11 +208,14 @@ def generate_response(dots, img):
         r = dot.size//2
         area = 3.14*r**2
         thresh_copy = thresh[int(y-r):int(y+r+1), int(x-r):int(x+r+1)]
-        black_pix = (r*2)**2 - cv2.countNonZero(thresh_copy)
+        black_pix = (r*2)**2 - np.count_nonzero(thresh_copy)
         confidence = black_pix/area
         dot.response = confidence
         # print(confidence)
         # show_image(thresh_copy, "Thresh")
+        
+        
+
 st.set_page_config(page_title="Braille Translator", page_icon="👁️")
 
 st.markdown("# Braille Translator")
@@ -231,21 +224,22 @@ st.write(
     """This program uses OpenCV to capture and interpret a braille message."""
 )
 
+dot_color = st.toggle("White Dots")
+
+
 uploaded_file = st.file_uploader("Choose a picture of a puzzle", ['png','jpg'], False)
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
-    img_cv2 = np.array(image)
-    img = cv2.cvtColor(img_cv2, cv2.COLOR_BGR2GRAY)
-
-    dot_color = 1
+    img = np.array(image)
 
 
 
 
-    blur = cv2.GaussianBlur(img, (5,5), 1)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    blur = cv2.GaussianBlur(gray, (5,5), 1)
     # Create Binary image
     ret, thresh = cv2.threshold(blur, 200,255, cv2.THRESH_BINARY)
-    if dot_color == 1:
+    if dot_color:
         thresh = cv2.bitwise_not(thresh)
     show_image(thresh, "img")
 
@@ -253,7 +247,7 @@ if uploaded_file is not None:
 
     # Step 1. Identify dots
 
-    dots = detector.detect(img)
+    dots = detector.detect(gray)
 
     # draws detected dots
 
