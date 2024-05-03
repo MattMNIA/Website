@@ -235,25 +235,33 @@ uploaded_file = st.file_uploader("Choose a picture of a puzzle", ['png','jpg'], 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
     img_cv2 = np.array(image)
-    img_cv2 = cv2.cvtColor(img_cv2, cv2.COLOR_BGR2GRAY)
+    img = cv2.cvtColor(img_cv2, cv2.COLOR_BGR2GRAY)
 
-    detector = create_detector()
+    dot_color = 1
 
+
+
+
+    blur = cv2.GaussianBlur(img, (5,5), 1)
+    # Create Binary image
+    ret, thresh = cv2.threshold(blur, 200,255, cv2.THRESH_BINARY)
+    if dot_color == 1:
+        thresh = cv2.bitwise_not(thresh)
+    show_image(thresh, "img")
+
+    detector = create_detector(thresh)
 
     # Step 1. Identify dots
 
-    dots = detector.detect(img_cv2)
+    dots = detector.detect(img)
 
     # draws detected dots
-    img_with_keypoints = cv2.drawKeypoints(img_cv2, dots, np.array([]), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
 
-
-    cv2.imshow('Blob Detection', img_with_keypoints)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-
+    img_with_keypoints = cv2.drawKeypoints(img, dots, np.array([]), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    x,y,w,h = find_bounds(dots)
+    cropped = crop_to_braille(img_with_keypoints, (x, y, w, h))
+    show_image(cropped, "fo show")
 
 
 
@@ -261,19 +269,28 @@ if uploaded_file is not None:
 
 
     # Identify size of circles.
-
-    dot_size = dots[0].size
-
+    try:
+        dot_size = dots[0].size
+    except:
+        raise Exception("No dots found...")
+        
     x,y,w,h = find_bounds(dots)
-    print(x)
-    print(y)
-    print(x+w)
-    print(y+h)
-    cv2.rectangle(img_cv2, (x,y), (x+w, y+h), (0,255,0),2)
+    # cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0),2)
 
-    cv2.imshow('Blob Detection', img_cv2)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+
+    cropped = crop_to_braille(img, (x, y, w, h))
+
+    # sort dots by confidence
+    generate_response(dots, img)
+    dots_confidence = dots + ()
+    dots_x = dots + ()
+    dots_y = dots + ()
+    # sorts dots based on confidence
+    sorted(dots_confidence, key=lambda KeyPoint: KeyPoint.response, reverse=True)
+    # sorts dots based on x value
+    sorted(dots_x, key=lambda KeyPoint: KeyPoint.pt[0])
+    # sorts dots based on y value
+    sorted(dots_y, key=lambda KeyPoint: KeyPoint.pt[1])
     # Step 3. Split rectangle into 6ths
         
         
