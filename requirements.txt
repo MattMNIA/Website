@@ -1,4 +1,4 @@
 cv2
-numpy as np
-PIL import Image
-treamlit as st
+numpy
+PIL
+streamlit
