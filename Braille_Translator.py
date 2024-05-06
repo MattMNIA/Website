@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 import streamlit as st
 
-st.set_page_config(page_title="Braille Translator", page_icon="👁️")
+# st.set_page_config(page_title="Braille Translator", page_icon="👁️")
 
 Braille_to_Letters = {
     "100000":"a",
