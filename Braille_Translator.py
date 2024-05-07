@@ -506,7 +506,7 @@ if uploaded_file is not None:
     while(not st.button("Enter Sizes")):
         values = st.slider(
         "Select a range of dot sizes",
-        0, int(img.size//0.3), (0, int(img.size//0.3)))
+        1, int(img.size//0.3), (1, int(img.size//0.3)))
         detector = create_detector_size(values[0],values[1])
         
         threshold = st.slider("Select a confidence level for valid dots",
