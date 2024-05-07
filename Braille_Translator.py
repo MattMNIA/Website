@@ -152,8 +152,6 @@ def create_detector(img):
     
     # Filter by Area.
     params.filterByArea = True
-    img_w, img_h = img.shape[::-1]
-    img_area = img_w*img_h
     # Use "find_blob_size" method to determine
     # appropriate minimum area for blobs
     area = find_blob_size(img)
@@ -262,6 +260,28 @@ def generate_response(dots, img):
         dot.response = confidence
         # print(confidence)
         # show_image(thresh_copy, "Thresh")
+        
+def filter_confidence(dots, threshold):
+    """Removes dots that are incorrectly idenfified
+
+    Args:
+        dots (KeyPoints[]): An array of dots stored as KeyPoints
+        threshold (double): A percentage of confidence that a keypoint must be to remain valid
+        
+    Return:
+        filtered_dots (KeyPoints[]): An array of dots stored as KeyPoints with any dot
+        whos confidence level is under the given threshold removed
+    """
+    filtered_dots = list()
+    for dot in dots:
+        if dot.response>=threshold:
+            filtered_dots.add(dot)
+    return filtered_dots
+            
+            
+     
+    
+    
         
 def group_dots(dots, dot_size):
     """find and groups dots that coorespond to the same letter
@@ -478,6 +498,9 @@ if uploaded_file is not None:
 
     # sort dots by confidence
     generate_response(dots, img)
+    
+    # filter out low confidence levels
+    dots = filter_confidence(dots, 0.5)
     dots_confidence = dots + ()
     dots_x = dots + ()
     dots_y = dots + ()
