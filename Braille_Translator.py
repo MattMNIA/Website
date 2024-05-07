@@ -171,7 +171,7 @@ def create_detector(img):
     params.minInertiaRatio = 0.1
 
     detector = cv2.SimpleBlobDetector.create(params)
-    return detector
+    return detector, params.minArea
 
 def create_detector_size(minSize, maxSize):
     """summary: Uses the size of image to more reliably
@@ -502,7 +502,7 @@ if uploaded_file is not None:
     if dot_color:
         thresh = cv2.bitwise_not(thresh)
     # show_image(thresh, "img")
-    detector = create_detector(thresh)
+    detector, minArea = create_detector(thresh)
     dots = detector.detect(thresh)
     img_with_keypoints = cv2.drawKeypoints(img, dots, np.array([]), (0, 255, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     x,y,w,h = find_bounds(dots)
@@ -511,8 +511,8 @@ if uploaded_file is not None:
     st.image(rectangle_bound)
     st.image(cropped)
     while(not st.button("Enter Sizes", key= "Enter_button")):
-        minRad = st.number_input("Select Minimum Radius", min_value = detector.minArea, step = 5)
-        maxRad = st.number_input("Select Maximum Radius", min_value = detector.maxArea, step = 5)
+        minRad = st.number_input("Select Minimum Radius", min_value = minArea, step = 5)
+        maxRad = st.number_input("Select Maximum Radius", min_value = minArea+20, step = 5)
         
         # convert radius into area
         detector = create_detector_size(3.14*minRad**2, 3.14*maxRad**2)
