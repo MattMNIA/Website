@@ -511,32 +511,33 @@ if uploaded_file is not None:
     st.image(rectangle_bound)
     st.image(cropped)
     if st.button("Tweak Size", key="Tweak Size"):
-        while(not st.button("Enter Sizes", key= "Enter_button")):
-            minRad = st.number_input("Select Minimum Radius", value = minArea, step = 5.0)
-            maxRad = st.number_input("Select Maximum Radius", value = minArea+20, step = 5.0)
-            
-            # convert radius into area
-            detector = create_detector_size(3.14*minRad**2, 3.14*maxRad**2)
-            
-            threshold = st.slider("Select a confidence level for valid dots",
-            0.0, 1.0, 0.5)
-            # Step 1. Identify dots
+        if not st.button("Enter Sizes", key= "Enter_button"):
+            while(True):
+                minRad = st.number_input("Select Minimum Radius", value = minArea, step = 5.0)
+                maxRad = st.number_input("Select Maximum Radius", value = minArea+20, step = 5.0)
+                
+                # convert radius into area
+                detector = create_detector_size(3.14*minRad**2, 3.14*maxRad**2)
+                
+                threshold = st.slider("Select a confidence level for valid dots",
+                0.0, 1.0, 0.5)
+                # Step 1. Identify dots
 
-            dots = detector.detect(gray)
+                dots = detector.detect(gray)
 
-            # add response variable to dots
-            generate_response(dots, img)
-            
-            # filter out low confidence levels
-            dots = filter_confidence(dots, threshold)
-            if len(dots)>0:
-                # draws detected dots
-                img_with_keypoints = cv2.drawKeypoints(img, dots, np.array([]), (0, 255, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-                x,y,w,h = find_bounds(dots)
-                cropped = crop_to_braille(img_with_keypoints, (x, y, w, h))
-                rectangle_bound = cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2, cv2.FONT_HERSHEY_SIMPLEX)
-                st.image(rectangle_bound)
-                st.image(cropped)
+                # add response variable to dots
+                generate_response(dots, img)
+                
+                # filter out low confidence levels
+                dots = filter_confidence(dots, threshold)
+                if len(dots)>0:
+                    # draws detected dots
+                    img_with_keypoints = cv2.drawKeypoints(img, dots, np.array([]), (0, 255, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+                    x,y,w,h = find_bounds(dots)
+                    cropped = crop_to_braille(img_with_keypoints, (x, y, w, h))
+                    rectangle_bound = cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2, cv2.FONT_HERSHEY_SIMPLEX)
+                    st.image(rectangle_bound)
+                    st.image(cropped)
     #show_image(cropped, "cropped")
 
 
