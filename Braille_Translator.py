@@ -464,9 +464,13 @@ if uploaded_file is not None:
 
     dots = detector.detect(gray)
 
+    # add response variable to dots
+    generate_response(dots, img)
+    
+    # filter out low confidence levels
+    dots = filter_confidence(dots, 0.5)
+    
     # draws detected dots
-
-
     img_with_keypoints = cv2.drawKeypoints(img, dots, np.array([]), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     x,y,w,h = find_bounds(dots)
     cropped = crop_to_braille(img_with_keypoints, (x, y, w, h))
@@ -493,10 +497,9 @@ if uploaded_file is not None:
     cropped = crop_to_braille(img, (x, y, w, h))
 
     # sort dots by confidence
-    generate_response(dots, img)
     
-    # filter out low confidence levels
-    dots = filter_confidence(dots, 0.5)
+    
+    
     dots_confidence = dots + ()
     dots_x = dots + ()
     dots_y = dots + ()
