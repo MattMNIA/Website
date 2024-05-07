@@ -504,10 +504,11 @@ if uploaded_file is not None:
     # show_image(thresh, "img")
     
     while(not st.button("Enter Sizes")):
-        values = st.slider(
-        "Select a range of dot sizes",
-        30, int(img.size//10), (30, int(img.size//10)))
-        detector = create_detector_size(values[0],values[1])
+        minRad = st.number_input("Select Minimum Radius", min_value = 5, step = 5)
+        maxRad = st.number_input("Select Maximum Radius", min_value = 10, step = 5)
+        
+        # convert radius into area
+        detector = create_detector_size(3.14*minRad**2, 3.14*maxRad**2)
         
         threshold = st.slider("Select a confidence level for valid dots",
         0.0, 1.0, 0.5)
