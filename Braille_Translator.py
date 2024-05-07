@@ -555,8 +555,8 @@ if uploaded_file is not None:
     
     
     dots_confidence = dots + []
-    dots_x = dots + []
-    dots_y = dots + []
+    dots_x = dots + ()
+    dots_y = dots + ()
     dots_confidence = sorted(dots_confidence, key=lambda KeyPoint: KeyPoint.response, reverse=True)
     # sorts dots based on x value
     dots_x = sorted(dots_x, key=lambda KeyPoint: KeyPoint.pt[0])
