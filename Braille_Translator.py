@@ -510,7 +510,7 @@ if uploaded_file is not None:
         detector = create_detector_size(values[0],values[1])
         
         threshold = st.slider("Select a confidence level for valid dots",
-        0.0, 1.0, (0.0,1.0))
+        0.0, 1.0, 0.5)
         # Step 1. Identify dots
 
         dots = detector.detect(gray)
