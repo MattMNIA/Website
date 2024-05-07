@@ -529,14 +529,14 @@ if uploaded_file is not None:
             
             # filter out low confidence levels
             dots = filter_confidence(dots, threshold)
-            
-            # draws detected dots
-            img_with_keypoints = cv2.drawKeypoints(img, dots, np.array([]), (0, 255, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-            x,y,w,h = find_bounds(dots)
-            cropped = crop_to_braille(img_with_keypoints, (x, y, w, h))
-            rectangle_bound = cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2, cv2.FONT_HERSHEY_SIMPLEX)
-            st.image(rectangle_bound)
-            st.image(cropped)
+            if len(dots)>0:
+                # draws detected dots
+                img_with_keypoints = cv2.drawKeypoints(img, dots, np.array([]), (0, 255, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+                x,y,w,h = find_bounds(dots)
+                cropped = crop_to_braille(img_with_keypoints, (x, y, w, h))
+                rectangle_bound = cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2, cv2.FONT_HERSHEY_SIMPLEX)
+                st.image(rectangle_bound)
+                st.image(cropped)
     #show_image(cropped, "cropped")
 
 
