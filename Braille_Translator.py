@@ -511,8 +511,8 @@ if uploaded_file is not None:
     st.image(rectangle_bound)
     st.image(cropped)
     while(not st.button("Enter Sizes")):
-        minRad = st.number_input("Select Minimum Radius", min_value = 5, step = 5)
-        maxRad = st.number_input("Select Maximum Radius", min_value = 10, step = 5)
+        minRad = st.number_input("Select Minimum Radius", min_value = detector.minArea, step = 5)
+        maxRad = st.number_input("Select Maximum Radius", min_value = detector.maxArea, step = 5)
         
         # convert radius into area
         detector = create_detector_size(3.14*minRad**2, 3.14*maxRad**2)
