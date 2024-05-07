@@ -173,6 +173,51 @@ def create_detector(img):
     detector = cv2.SimpleBlobDetector.create(params)
     return detector
 
+def create_detector_size(minSize, maxSize):
+    """summary: Uses the size of image to more reliably
+    detect braille dots.
+    
+    
+    Args:
+        img (image): image of braille characters
+    
+    Returns:
+        blob detector object
+    """
+    
+    # creates detector
+    params = cv2.SimpleBlobDetector_Params()
+
+    params.filterByColor = 0
+    # detect darker blobs : 0, detect lighter blobs : 256
+    params.blobColor = 0
+
+    # Change thresholds
+    params.minThreshold = 10
+    params.maxThreshold = 300
+    
+    # Filter by Area.
+    params.filterByArea = True
+    # Use "find_blob_size" method to determine
+    # appropriate minimum area for blobs
+    params.minArea = minSize
+    params.maxArea = maxSize
+    
+    # Filter by Circularity
+    # 1 = perfect circle, 0.785 is a square
+    params.filterByCircularity = True
+    params.minCircularity = 0.5
+    
+    # Filter by Convexity
+    params.filterByConvexity = False
+    params.minConvexity = 0.1
+    
+    # Filter by Inertia
+    params.filterByInertia = False
+    params.minInertiaRatio = 0.1
+
+    detector = cv2.SimpleBlobDetector.create(params)
+    return detector
 
 def find_blob_size(img):
     """Fixes issue with detector detecting dots that are
@@ -443,10 +488,10 @@ dot_color = st.toggle("White Dots")
 
 
 uploaded_file = st.file_uploader("Choose a picture of a puzzle", ['png','jpg'], False)
+
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
     img = np.array(image)
-
 
 
 
@@ -457,26 +502,32 @@ if uploaded_file is not None:
     if dot_color:
         thresh = cv2.bitwise_not(thresh)
     # show_image(thresh, "img")
-
-    detector = create_detector(thresh)
-
-    # Step 1. Identify dots
-
-    dots = detector.detect(gray)
-
-    # add response variable to dots
-    generate_response(dots, img)
     
-    # filter out low confidence levels
-    dots = filter_confidence(dots, 0.4)
-    
-    # draws detected dots
-    img_with_keypoints = cv2.drawKeypoints(img, dots, np.array([]), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-    x,y,w,h = find_bounds(dots)
-    cropped = crop_to_braille(img_with_keypoints, (x, y, w, h))
-    rectangle_bound = cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2, cv2.FONT_HERSHEY_SIMPLEX)
-    st.image(rectangle_bound)
-    st.image(cropped)
+    while(not st.button("Enter Sizes")):
+        values = st.slider(
+        "Select a range of dot sizes",
+        0.0, int(img.size//0.3), (0, img.size//0.3))
+        detector = create_detector_size(values[0],values[1])
+        
+        threshold = st.slider("Select a confidence level for valid dots",
+        0.0, 1, (0,1))
+        # Step 1. Identify dots
+
+        dots = detector.detect(gray)
+
+        # add response variable to dots
+        generate_response(dots, img)
+        
+        # filter out low confidence levels
+        dots = filter_confidence(dots, threshold)
+        
+        # draws detected dots
+        img_with_keypoints = cv2.drawKeypoints(img, dots, np.array([]), (0, 255, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        x,y,w,h = find_bounds(dots)
+        cropped = crop_to_braille(img_with_keypoints, (x, y, w, h))
+        rectangle_bound = cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2, cv2.FONT_HERSHEY_SIMPLEX)
+        st.image(rectangle_bound)
+        st.image(cropped)
     #show_image(cropped, "cropped")
 
 
