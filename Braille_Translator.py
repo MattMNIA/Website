@@ -275,12 +275,8 @@ def filter_confidence(dots, threshold):
     filtered_dots = list()
     for dot in dots:
         if dot.response>=threshold:
-            filtered_dots.add(dot)
+            filtered_dots.append(dot)
     return filtered_dots
-            
-            
-     
-    
     
         
 def group_dots(dots, dot_size):
