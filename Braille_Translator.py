@@ -468,7 +468,7 @@ if uploaded_file is not None:
     generate_response(dots, img)
     
     # filter out low confidence levels
-    dots = filter_confidence(dots, 0.5)
+    dots = filter_confidence(dots, 0.4)
     
     # draws detected dots
     img_with_keypoints = cv2.drawKeypoints(img, dots, np.array([]), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
@@ -490,19 +490,13 @@ if uploaded_file is not None:
     except:
         raise Exception("No dots found...")
         
-    x,y,w,h = find_bounds(dots)
-    # cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0),2)
-
-
-    cropped = crop_to_braille(img, (x, y, w, h))
 
     # sort dots by confidence
     
     
-    
-    dots_confidence = dots + ()
-    dots_x = dots + ()
-    dots_y = dots + ()
+    dots_confidence = dots + []
+    dots_x = dots + []
+    dots_y = dots + []
     dots_confidence = sorted(dots_confidence, key=lambda KeyPoint: KeyPoint.response, reverse=True)
     # sorts dots based on x value
     dots_x = sorted(dots_x, key=lambda KeyPoint: KeyPoint.pt[0])
