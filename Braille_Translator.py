@@ -502,7 +502,14 @@ if uploaded_file is not None:
     if dot_color:
         thresh = cv2.bitwise_not(thresh)
     # show_image(thresh, "img")
-    
+    detector = create_detector(thresh)
+    dots = detector.detect(thresh)
+    img_with_keypoints = cv2.drawKeypoints(img, dots, np.array([]), (0, 255, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    x,y,w,h = find_bounds(dots)
+    cropped = crop_to_braille(img_with_keypoints, (x, y, w, h))
+    rectangle_bound = cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2, cv2.FONT_HERSHEY_SIMPLEX)
+    st.image(rectangle_bound)
+    st.image(cropped)
     while(not st.button("Enter Sizes")):
         minRad = st.number_input("Select Minimum Radius", min_value = 5, step = 5)
         maxRad = st.number_input("Select Maximum Radius", min_value = 10, step = 5)
