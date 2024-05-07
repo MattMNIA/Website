@@ -510,7 +510,7 @@ if uploaded_file is not None:
     rectangle_bound = cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0), 2, cv2.FONT_HERSHEY_SIMPLEX)
     st.image(rectangle_bound)
     st.image(cropped)
-    while(not st.button("Enter Sizes")):
+    while(not st.button("Enter Sizes", key= "Enter_button")):
         minRad = st.number_input("Select Minimum Radius", min_value = detector.minArea, step = 5)
         maxRad = st.number_input("Select Maximum Radius", min_value = detector.maxArea, step = 5)
         
